@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Click 2 Remove
-// @namespace    http://bambam2174.github.io/
+// @namespace    http://sedatkilinc05.github.io/
 // @version      0.1.2
 // @description  Mark & unmark HTML element with Alt+Click. Remove marked elements with Alt+Shift+R
-// @author       Sedat Kpunkt <bambam2174@gmail.com>
+// @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tagesspiegel.de
 // @grant        none
-// @supportURL   https://github.com/bambam2174/tampermonkey-scriptz/
-// @homepageURL  http://bambam2174.github.io/
-// @updateURL 	 https://github.com/bambam2174/tampermonkey-scriptz/raw/main/Click%202%20Remove.user.js
-// @downloadURL  https://github.com/bambam2174/tampermonkey-scriptz/raw/main/Click%202%20Remove.user.js
+// @supportURL   https://github.com/sedatkilinc05/tampermonkey-scriptz/
+// @homepageURL  http://sedatkilinc05.github.io/
+// @updateURL 	 https://github.com/sedatkilinc05/tampermonkey-scriptz/raw/main/Click%202%20Remove.user.js
+// @downloadURL  https://github.com/sedatkilinc05/tampermonkey-scriptz/raw/main/Click%202%20Remove.user.js
 // ==/UserScript==
 
 (function() {

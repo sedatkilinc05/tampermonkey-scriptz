@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Input Persistererer
-// @namespace    http://bambam2174.github.io/
+// @namespace    http://sedatkilinc05.github.io/
 // @version      0.1
 // @description  When writing something in an input field, textarea or comment box the input is made persistent locally in the localStorage. This was mandatory after having lost stuff I wrote for hours got lost because of my cat trampling over my keyboard
-// @author       Sedat Kpunkt <bambam2174@gmail.com>
+// @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        none
