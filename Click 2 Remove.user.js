@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Click 2 Remove
 // @namespace    http://sedatkilinc05.github.io/
-// @version      0.1.2
+// @version      0.1.3
 // @description  Mark & unmark HTML element with Alt+Click. Remove marked elements with Alt+Shift+R
 // @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*/*
@@ -18,6 +18,7 @@
 
     document.lastEventType = document.lastEventType || 'click';
     document.listClickedElements = document.listClickedElements || [];
+    document.listRemovedElements = document.listRemovedElements || [];
 
     function eventListener(event) {
         console.log('event ' + event.type, event.target,'☞☛👉🏿👉🏾👉🏽👉🏼👉🏻👉—————————————————————👈👈🏻👈🏼👈🏽👈🏾👈🏿☚☜', event);
@@ -59,13 +60,27 @@
             return;
         }
         if (event.code == 'KeyR') {
-            console.log('key', event.key, event.keyCode);
+            console.log('key', event.code, event.key, event.keyCode);
             if (confirm('remove them?')) {
+                let currentElements = [];
+                document.listRemovedElements.push(currentElements)
                 document.listClickedElements.forEach(el => {
-                    el.remove();
+                    currentElements.push(el);
+                    //el.remove();
+                    el.style.display = 'none';
                 });
                 document.listClickedElements = [];
             }
+        } else if (event.code == 'KeyZ' || event.code == 'KeyY') {            
+            let removedElements = document.listRemovedElements.pop() || [];
+            removedElements.forEach(el => {
+                el.style.display = '';
+                el.dataset.clicked = (el.dataset.clicked != undefined) ? el.dataset.clicked : -1;
+                el.dataset.clicked *= -1
+                el.style.border = (el.dataset.clicked > 0) ? '3px outset red' : '';
+            });
+        } else {
+            console.log('key', event.code, event.key, event.keyCode);
         }
     });
 
