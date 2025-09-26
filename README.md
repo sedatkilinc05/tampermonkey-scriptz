@@ -9,6 +9,12 @@
 
         Useful when you intend to save a webpage as PDF without certain content like ads or whatever.
 
+### Usage
+
+        Alt-Click marking and demarking elements
+        Alt-R remove all marked elements
+        ALt-Z undo
+
 ***Successfully tested on:***
 
         * Chrome Version 114.0.5735.106 (Official Build) (x86_64)
