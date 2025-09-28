@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube-Like
 // @namespace    http://sedatkilinc05.github.io/
-// @version      0.6.8.2
+// @version      0.6.8.3
 // @description  Automatic Like or Dislike of YouTube-Clips of selected channels
 // @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*.youtube.com/watch*
@@ -39,31 +39,12 @@
         saveChannel('@SedatKPunkt');
         saveChannel('@garipthecat2067');
     } else {
-        const tmpChannels = JSON.parse(localStorage.getItem('channels'));
-        logit(' tmpChannels', tmpChannels);
-        tmpChannels.forEach(el => { arrChannels.push(el); });
-        logit(' arrChannels', arrChannels);
+        arrChannels.push(...JSON.parse(localStorage.getItem('channels')))
     }
 
     if (localStorage.getItem('dislikechannels') !== null) {
-        const tmpDislikeChannels = JSON.parse(localStorage.getItem('dislikechannels'));
-        logit(' tmpDislikeChannels', tmpDislikeChannels);
-        tmpDislikeChannels.forEach(el => { arrDislikeChannels.push(el); });
-        logit(' arrDislikeChannels', arrDislikeChannels);
+        arrDislikeChannels.push(...JSON.parse(localStorage.getItem('dislikechannels')))
     }
-
-
-    const listener = e => {
-        logit('event ' + e.type, e.target, e);
-    }
-
-
-    const videoListener = ev => {
-        logit('video•'+ ev.type, ev.target.baseURI.split('=').pop(), ev);
-        findChannelName(ev.type);
-        lookForLikeButton(0);
-        removeAdRendererAll();
-            };
 
     const loadListener = (ev) => {
         logit(' Event '+ ev.type + '•' + ev.target + '.addEventListener',ev);
