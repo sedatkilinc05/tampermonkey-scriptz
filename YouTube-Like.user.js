@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube-Like
 // @namespace    http://sedatkilinc05.github.io/
-// @version      0.6.8.3
+// @version      0.6.8.4
 // @description  Automatic Like or Dislike of YouTube-Clips of selected channels
 // @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*.youtube.com/watch*
@@ -55,8 +55,6 @@
 
     const keyUpListener = ev => {
         logit('keyup event object', ev);
-/*        ev.preventDefault();
-        ev.stopPropagation();*/
 
         findChannelName('onkeyup');
 
@@ -68,7 +66,7 @@
 
         switch (ev.code) {
             case 'KeyL':
-                handleChannel(currentChannel);
+                handleChannel(currentChannel, !ev.shiftKey);
                 pressedAltR = false;
                 break;
             case 'KeyR':
@@ -94,8 +92,6 @@
                 break
         }
     }
-
-    window.addEventListener('load', loadListener);
 
     document.addEventListener('load', loadListener);
 
@@ -130,28 +126,27 @@
         }
     }
 
-    function lookForLikeButton(action) {
+    function lookForLikeButton(action, prevState = false) {
         logit('lookForLikeButton', 'action = ' + action);
-        // '#segmented-like-button ytd-toggle-button-renderer yt-button-shape button'
-       //  '.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button'
+
         if ((btnLike = document.querySelectorAll('#segmented-like-button ytd-toggle-button-renderer yt-button-shape button')[0]
-             || document.querySelectorAll('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[0]
+            || document.querySelectorAll('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[0]
             || document.querySelectorAll('segmented-like-dislike-button-view-model like-button-view-model > toggle-button-view-model button')[0]) &&
            (btnDisLike = document.querySelectorAll('#segmented-dislike-button ytd-toggle-button-renderer yt-button-shape button')[0]
             || document.querySelectorAll('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[1]
-           || document.querySelectorAll('segmented-like-dislike-button-view-model dislike-button-view-model > toggle-button-view-model button')[0])) {
+            || document.querySelectorAll('segmented-like-dislike-button-view-model dislike-button-view-model > toggle-button-view-model button')[0])) {
             logit('btnLike = ', btnLike, "btnDisLike", btnDisLike);
             switch(action) {
                 case 1:
                     logit('lookForLikeButton • btnLike is', btnLike.firstChild.firstChild.classList.contains('style-default-active'));;
-                    if (btnLike.ariaPressed === 'false') {
+                    if (btnLike.ariaPressed === prevState.toString()) {
 
                         btnLike.click();
                     }
                     break;
                 case 2:
                     logit('lookForDisLikeButton • btnDisLike is', btnLike.firstChild.firstChild.classList.contains('style-default-active'));;
-                    if (btnDisLike.ariaPressed === 'false') {
+                    if (btnDisLike.ariaPressed === prevState.toString()) {
 
                         btnDisLike.click();
                     }
@@ -163,17 +158,24 @@
         }
     }
 
-    function handleChannel(channelName) {
+    function handleChannel(channelName, like) {
         if (channelName == "") {
             return;
         }
-        if (arrChannels.indexOf(channelName) < 0) {
+        if (like && arrChannels.indexOf(channelName) < 0) {
             saveChannel(channelName);
-            lookForLikeButton(1);
-        } else {
+            removeDislikeChannel(channelName);
+            lookForLikeButton(1, false);
+        } else if(like) {
             removeChannel(channelName);
+            lookForLikeButton(1, true);
+        } else if (!like && arrDislikeChannels.indexOf(channelName) < 0) {
             saveDislikeChannel(channelName);
-            lookForLikeButton(2);
+            removeChannel(channelName);
+            lookForLikeButton(2, false);
+        } else {
+            removeDislikeChannel(channelName);
+            lookForLikeButton(2, true);
         }
     }
 
@@ -257,9 +259,3 @@
         nlAdRenderer.forEach(onElementExecute);
     }
 })();
-
-
-
-
-
-
