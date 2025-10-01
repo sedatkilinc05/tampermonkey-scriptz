@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube-Like
 // @namespace    http://sedatkilinc05.github.io/
-// @version      0.6.8.4
+// @version      0.6.9
 // @description  Automatic Like or Dislike of YouTube-Clips of selected channels
 // @author       Sedat Kpunkt <sedatkilinc05@gmail.com>
 // @match        https://*.youtube.com/watch*
@@ -16,6 +16,9 @@
 
 (function() {
     'use strict';
+
+    const $ = document.querySelector.bind(document);
+    const $$ = document.querySelectorAll.bind(document);
 
     function logit(...args) {
         console.log('[SEDAT•YouTube-Like]:', ...args);
@@ -108,13 +111,13 @@
         logit('currentTitle', currentTitle);
         logit('saveTitle', saveTitle());
 
-        let allAnchorTagsChannel = document.querySelectorAll('a[href^="/c"]');
+        let allAnchorTagsChannel = $$('a[href^="/c"]');
         logit('allAnchorTagsChannel.length', allAnchorTagsChannel.length);
 
-        let allAnchorTagsChannelName = document.querySelectorAll('ytd-video-owner-renderer.ytd-watch-metadata  > div.ytd-video-owner-renderer  > ytd-channel-name.ytd-video-owner-renderer  > div.ytd-channel-name  > div.ytd-channel-name  > yt-formatted-string.ytd-channel-name.complex-string  > a.yt-simple-endpoint.yt-formatted-string');
+        let allAnchorTagsChannelName = $$('ytd-video-owner-renderer.ytd-watch-metadata  > div.ytd-video-owner-renderer  > ytd-channel-name.ytd-video-owner-renderer  > div.ytd-channel-name  > div.ytd-channel-name  > yt-formatted-string.ytd-channel-name.complex-string  > a.yt-simple-endpoint.yt-formatted-string');
         logit('allAnchorTagsChannelName.length', allAnchorTagsChannelName.length);
-        if (!found && allAnchorTagsChannelName.length > 0) {
-            currentChannel = allAnchorTagsChannelName[0].href.split('/').pop();
+
+        if (!found && foundChannelName()) {
             logit('currentChannel', currentChannel);
             if (arrChannels.indexOf(currentChannel) > -1) {
                 lookForLikeButton(1);
@@ -126,15 +129,41 @@
         }
     }
 
+    function foundChannelName() {
+        isShorts() ? currentChannel = getChannelNameShorts() : currentChannel = getChannelName();
+        return currentChannel != '';
+    }
+
+    function getChannelName() {
+        let channelName = '';
+        let allAnchorTagsChannelName = $$('ytd-video-owner-renderer.ytd-watch-metadata  > div.ytd-video-owner-renderer  > ytd-channel-name.ytd-video-owner-renderer  > div.ytd-channel-name  > div.ytd-channel-name  > yt-formatted-string.ytd-channel-name.complex-string  > a.yt-simple-endpoint.yt-formatted-string');
+        if (allAnchorTagsChannelName != 0 && allAnchorTagsChannelName.length > 0) {
+            let arrChannelURL = allAnchorTagsChannelName[0].href.split('/');
+            channelName = arrChannelURL.pop();
+        }
+        return channelName;
+    }
+
+    function getChannelNameShorts() {
+        let channelName = '';
+        let allAnchorTagsChannelName = $$('yt-reel-channel-bar-view-model a');
+        if (allAnchorTagsChannelName != 0 && allAnchorTagsChannelName.length > 0) {
+            //channelName = allAnchorTagsChannelName[0].href.replace(location.protocol+'//'+location.host+'/', '').replace('/shorts', '');
+            let arrChannelURL = allAnchorTagsChannelName[0].href.split('/');
+            channelName = arrChannelURL.pop();
+            if(channelName == 'shorts') {
+                channelName = arrChannelURL.pop();
+            }
+        }
+        return channelName;
+    }
+
     function lookForLikeButton(action, prevState = false) {
         logit('lookForLikeButton', 'action = ' + action);
 
-        if ((btnLike = document.querySelectorAll('#segmented-like-button ytd-toggle-button-renderer yt-button-shape button')[0]
-            || document.querySelectorAll('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[0]
-            || document.querySelectorAll('segmented-like-dislike-button-view-model like-button-view-model > toggle-button-view-model button')[0]) &&
-           (btnDisLike = document.querySelectorAll('#segmented-dislike-button ytd-toggle-button-renderer yt-button-shape button')[0]
-            || document.querySelectorAll('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[1]
-            || document.querySelectorAll('segmented-like-dislike-button-view-model dislike-button-view-model > toggle-button-view-model button')[0])) {
+        isShorts() ? setLikeDisLikeButtonsShorts() : setLikeDislikeButtons()
+
+        if (btnLike && btnDisLike) {
             logit('btnLike = ', btnLike, "btnDisLike", btnDisLike);
             switch(action) {
                 case 1:
@@ -156,6 +185,28 @@
                     break;
             }
         }
+    }
+
+    function setLikeDislikeButtons() {
+        btnLike = $$('#segmented-like-button ytd-toggle-button-renderer yt-button-shape button')[0]
+             || $$('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[0]
+             || $$('segmented-like-dislike-button-view-model like-button-view-model > toggle-button-view-model button')[0];
+        btnDisLike = $$('#segmented-dislike-button ytd-toggle-button-renderer yt-button-shape button')[0]
+             || $$('.watch-active-metadata .ytd-toggle-button-renderer button#button.yt-icon-button')[1]
+             || $$('segmented-like-dislike-button-view-model dislike-button-view-model > toggle-button-view-model button')[0];
+    }
+
+    function setLikeDisLikeButtonsShorts() {
+        const arrButtons = $$('ytd-like-button-renderer yt-button-shape button');
+        btnLike = arrButtons[0];
+        btnDisLike = arrButtons[1];
+    }
+
+    function isShorts() {
+        let isShort = false;
+        let result = location.href.match('shorts');
+        if (result != null && result.length > 0) { isShort = true; };
+        return isShort;
     }
 
     function handleChannel(channelName, like) {
@@ -243,19 +294,19 @@
     }
 
     function removeAdRenderer() {
-        let adRenderer = document.querySelector('#rendering-content');
+        let adRenderer = $('#rendering-content');
         if (adRenderer != null) {
             adRenderer.remove();
         }
     }
 
     function removeAdRendererAll() {
-        let nlAdRenderer = document.querySelectorAll('#rendering-content');
+        let nlAdRenderer = $$('#rendering-content');
         nlAdRenderer.forEach(adRenderer => adRenderer.remove());
     }
 
     function ExecuteOnEachAdRenderer(onElementExecute) {
-        let nlAdRenderer = document.querySelectorAll('#rendering-content');
+        let nlAdRenderer = $$('#rendering-content');
         nlAdRenderer.forEach(onElementExecute);
     }
 })();
